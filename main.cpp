@@ -149,9 +149,21 @@ public:
             else if(lex == '>') outFile<< "TokMayor";
             else if(lex == '/'){
                 lex=inFile.get();
-            }
+                if(lex == '/'){
+                    lex=inFile.get();
+                    while(lex!='\n')
+                    lex=inFile.get();
+                    inFile.unget();
+                    outFile<<"TOKComentarioCorto";
+
+                }
+                else if(isalpha(lex)){
+                    outFile<<"TokDiv";
+                    inFile.unget();
+                }
 
             else if(isalpha(lex) || lex=='_'){
+
                 id = lex;
                 lex=inFile.get();
                 while(isalnum(lex) || lex == '_'){
@@ -165,6 +177,7 @@ public:
             else outFile<<lex;
         }
     }
+    }
 
     void recuperaTokens(){
 
@@ -172,12 +185,30 @@ public:
 
         while(inFile.good()){
 
-            char lex = 0;
+            char lex =0;
             inFile.get(lex);
             if(lex == '(') outFile<< "TokPI";
             else if(lex == ';') outFile<< "TokPyC";
             else if(lex == '<') outFile<< "TokMenor";
             else if(lex == '>') outFile<< "TokMayor";
+            else if(lex == '/'){
+                lex = inFile.get();
+                if(lex == '/'){
+                    lex = inFile.get();
+                    while (lex != '\n') lex = inFile.get();
+                    inFile.unget();
+                    outFile<<"Linea_Comentario";
+                }/*fdasfasf/******sdfdf*/
+                else if(lex == '*'){
+                    lex = inFile.get();
+                    while(lex != '/') lex = inFile.get();
+                    inFile.unget();
+                    outFile<<"Comentario_Largo";
+
+                }
+                else outFile<<"TOkDiv";
+            }
+
 
             else if(isalpha(lex) || lex=='_'){
                 id = lex;
@@ -186,7 +217,7 @@ public:
                     id += lex;
                     lex=inFile.get();
                 }
-                cout<<"TokID";
+                outFile<<"(TokID"<<id<<")";
                 inFile.unget();
             }
 
@@ -202,7 +233,7 @@ int main(int nargs, char**args){
     cAnalisisLexico miAnalisis(nargs, args);
 
     //miAnalisis.analizar();
-    miAnalisis.analizarLetra();
+    //miAnalisis.analizarLetra();
     miAnalisis.recuperaTokens();
 
 
