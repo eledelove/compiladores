@@ -12,11 +12,27 @@ class cAnalisisLexico{
 
     ifstream inFile;
     ofstream outFile;
-    string nameFileIn;
-    string nameFileOut;
     ifstream inPR;
 
+    string nameFileIn;
+    string nameFileOut;
+
     list<string> listaPR;
+
+    //Creamos el constructor sin argumentos
+public:
+    //
+
+    cAnalisisLexico(){}
+    //Constructor con argumentos
+
+
+    cAnalisisLexico(int nargs, char**args){
+
+        verificaArgumentos(nargs, args);
+
+    }
+
 
     void verificaArgumentos(int nargs, char**args){
 
@@ -40,7 +56,7 @@ class cAnalisisLexico{
 
         else{
 
-            cout <<"Sólo se tomarán los dos primero Archivos" <<endl;
+            cout <<"Solo se tomaran los dos primero Archivos" <<endl;
             cout <<"Archivo a Analizar: " <<args[1] <<endl;
             cout <<"Archivo de Salida: " <<args[2] <<endl;
             nameFileOut = args[2];
@@ -51,10 +67,14 @@ class cAnalisisLexico{
 
     }
 
+
     void abrirFicheros(string fileIn, string fileOut){
 
         inFile.open(fileIn.c_str());
         outFile.open(fileOut.c_str());
+
+        inPR.open("palabrasReservadas.txt");
+        string pr;
 
         try{
             if(inFile.fail())
@@ -63,73 +83,42 @@ class cAnalisisLexico{
             if(outFile.fail())
                 throw 2;
 
+            if(inPR.fail())
+                throw 3;
+
             }catch(int i){
                 if(i == 1) cout <<"Error al abrir archivo inicial" <<endl;
 
                 else if (i==2) cout <<"Error al abrir el archivo de salida" <<endl;
 
+                else if (i==3) cout <<"Error al abrir PalabrasReservadas" <<endl;
+
                 else cout <<"Error inesperado" <<endl;
             }
 
-        if(inFile.is_open() && outFile.is_open()) cout <<"Exito al abrir los archivos" <<endl;
+        if(inFile.is_open() && outFile.is_open() && inPR.is_open()){
+            cout <<"Exito al abrir los archivos" <<endl;
+            while(!inPR.eof()){
+
+            inPR >>pr;
+            listaPR.push_back(pr);
+            }
+        }
 
         else cout <<"Error al abrir los Archivos" <<endl;
 
-    }
 
-
-    //Creamos el constructor sin argumentos
-public:
-    //
-
-    cAnalisisLexico(){}
-    //Constructor con argumentos
-
-
-    cAnalisisLexico(int nargs, char**args){
-
-        verificaArgumentos(nargs, args);
-        string pr;
-
-        try{
-            inPR.open("palabrasReservadas.txt");
-            if(inPR.fail()) throw 0;
-
-            cout<<"Se abrio palabras reservadas";
-            while(!inPR.eof()){
-
-                inPR >>pr;
-                listaPR.push_back(pr);
-            }
-
-
-        }catch(int i){
-            cerr <<"Error al abrir palabras revervadas" <<endl;
+        for(list<string> :: iterator i=listaPR.begin(); i != listaPR.end(); i++){
+            cout<<*i<<endl;
         }
-    }
-
-    bool esPalabraReservada(string palabra){
-        bool resp;
-
-        for(list <string> :: iterator it = listaPR.begin(); it != listaPR.end(); it++){
-
-            if(strcmp((*it).c_str(), palabra.c_str()) == 0 ){
-                resp = true;
-                break;
-
-            }
-        }
-        return resp;
     }
 
 
     void analizar(){
 
-        string lex;
-        char c;
+        char c=0;
         while(!inFile.eof()){
-            //inFile>>lex;
-            //outFile<<lex;
+
             c = inFile.get();
             outFile<<c;
         }
@@ -138,47 +127,27 @@ public:
 
     void analizarLetra(){
 
-        string id;
 
         while(inFile.good()){
-
-            char lex = 0;
-            inFile.get(lex);
-            if(lex == '(') outFile<< "TokPI";
-            else if(lex == ';') outFile<< "TokPyC";
-            else if(lex == '<') outFile<< "TokMenor";
-            else if(lex == '>') outFile<< "TokMayor";
-            else if(lex == '/'){
-                lex=inFile.get();
-                if(lex == '/'){
-                    lex=inFile.get();
-                    while(lex!='\n')
-                    lex=inFile.get();
-                    inFile.unget();
-                    outFile<<"TOKComentarioCorto";
-
-                }
-                else if(isalpha(lex)){
-                    outFile<<"TokDiv";
-                    inFile.unget();
-                }
-
-            else if(isalpha(lex) || lex=='_'){
-
-                id = lex;
-                lex=inFile.get();
-                while(isalnum(lex) || lex == '_'){
-                    id += lex;
-                    lex=inFile.get();
-                }
-                outFile<<"TokID,"<<id<<")";
-                inFile.unget();
-            }
-
-            else outFile<<lex;
+            char c=0;
+            inFile.get(c);
+            outFile<<c;
         }
     }
+
+    bool esReservada(char * id){
+
+        bool reservada = false;
+
+        for(list <string>:: iterator i=listaPR.begin(); i != listaPR.end(); i++){
+            if(strcmp(id, (*i).c_str()) == 0){
+                reservada = true;
+                break;
+            }
+        }
+        return reservada;
     }
+
 
     void recuperaTokens(){
 
@@ -189,9 +158,11 @@ public:
             char lex =0;
             inFile.get(lex);
             if(lex == '(') outFile<< "TokPI";
+            else if(lex == ')') outFile<< "TokPD";
             else if(lex == ';') outFile<< "TokPyC";
             else if(lex == '<') outFile<< "TokMenor";
             else if(lex == '>') outFile<< "TokMayor";
+            else if
             else if(lex == '/'){
                 lex = inFile.get();
                 if(lex == '/'){
@@ -203,10 +174,6 @@ public:
 
                 else if(lex == '*'){
 
-                    /*lex = ///inFile.get();
-                    while(lex != '/') lex = inFile.get();
-                    inFile.unget();
-                    outFile<<"Comentario_Largo";*/
                     do{
                     while(inFile.get() != '*'); //se sale del while si llega un asterisco
                     inFile.unget();
@@ -232,7 +199,12 @@ public:
                     id += lex;
                     lex=inFile.get();
                 }
-                outFile<<"(TokID"<<id<<")";
+
+                if(!esReservada((char*)id.c_str()))
+                    outFile<<"TokID("<<id<<")";
+                else
+                    outFile<<"TokReservada("<<id<<")";
+
                 inFile.unget();
             }
 
@@ -243,6 +215,8 @@ public:
 };
 
 
+
+
 int main(int nargs, char**args){
 
     cAnalisisLexico miAnalisis(nargs, args);
@@ -250,11 +224,6 @@ int main(int nargs, char**args){
     //miAnalisis.analizar();
     //miAnalisis.analizarLetra();
     miAnalisis.recuperaTokens();
-
-
-    /*if(miAnalisis.esPalabraReservada("else")) cout <<"Es reservada"<<endl;
-
-    else cout <<"No es reservada"<<endl; */
 
     return 0;
 
