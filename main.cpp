@@ -171,7 +171,7 @@ public:
                 if(lex == '+') outFile<<"TokIncremento++";
                 else if (lex == '-') outFile<<"TokDecremento--";
                 else if (lex == '=') outFile<<"TokIncremento+=";
-                else if (isalpha(lex)) outFile<<"TokOPArit"<<lex;
+                else if (isalpha(lex) && toupper(lex) != 'E') outFile<<"TokOPArit"<<lex;
 
                 else{
 
@@ -181,16 +181,41 @@ public:
 
                 }
                 if(lex == '.'){
+                    num += lex;
                     lex=inFile.get();
                     while(isdigit(lex)){
                         num+=lex;
                         lex = inFile.get();
                 }
-                    outFile<<"TokFloat";
+                if(toupper(lex) != 'E')
+                outFile<<"TokFloat"<<num;
+
+                else {//if(toupper(lex) == 'E'){
+
+                    parteFinal:
+                    num +=lex;
+                    lex = inFile.get();
+
+                    if(lex == '+' || lex == '-' || isdigit(lex)){
+                        num += lex;
+                        lex = inFile.get();
+
+                        while(isdigit(lex)){
+                        num+=lex;
+                        lex = inFile.get();
+                        }
+
+                        outFile<<"TokNumExp"<<num;
+
+                    }
+                    else outFile<<"Error en el formato";
+                    }
+
+
                 }
-                else if(toupper(lex) == 'E'){
-                    int x=0;
-                }
+
+                else if(toupper(lex) == 'E') goto parteFinal;
+
                 else
                 outFile<<"TOKint"<<num;
                 inFile.unget();
