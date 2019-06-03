@@ -95,6 +95,7 @@ public:
             inPR.open("palabrasReservadas.txt");
             if(inPR.fail()) throw 0;
 
+            cout<<"Se abrio palabras reservadas";
             while(!inPR.eof()){
 
                 inPR >>pr;
@@ -198,14 +199,28 @@ public:
                     while (lex != '\n') lex = inFile.get();
                     inFile.unget();
                     outFile<<"Linea_Comentario";
-                }/*fdasfasf/******sdfdf*/
+                }
+
                 else if(lex == '*'){
-                    lex = inFile.get();
+
+                    /*lex = ///inFile.get();
                     while(lex != '/') lex = inFile.get();
                     inFile.unget();
-                    outFile<<"Comentario_Largo";
-
+                    outFile<<"Comentario_Largo";*/
+                    do{
+                    while(inFile.get() != '*'); //se sale del while si llega un asterisco
+                    inFile.unget();
+                    while(inFile.get() == '*');
+                    inFile.unget();
+                    if(inFile.get() == '/'){
+                    outFile<<"Comenario_Largo";
+                    break;
+                    }
+                    inFile.unget();
+                    }
+                    while(inFile.get() != '/');
                 }
+
                 else outFile<<"TOkDiv";
             }
 
