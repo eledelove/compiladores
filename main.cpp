@@ -162,7 +162,42 @@ public:
             else if(lex == ';') outFile<< "TokPyC";
             else if(lex == '<') outFile<< "TokMenor";
             else if(lex == '>') outFile<< "TokMayor";
-            else if
+            else if(lex == '+' || lex== '-' || isdigit(lex) ){
+
+                string num;
+                num=lex;
+
+                lex=inFile.get();
+                if(lex == '+') outFile<<"TokIncremento++";
+                else if (lex == '-') outFile<<"TokDecremento--";
+                else if (lex == '=') outFile<<"TokIncremento+=";
+                else if (isalpha(lex)) outFile<<"TokOPArit"<<lex;
+
+                else{
+
+                while(isdigit(lex)){
+                    num += lex;
+                    lex=inFile.get();
+
+                }
+                if(lex == '.'){
+                    lex=inFile.get();
+                    while(isdigit(lex)){
+                        num+=lex;
+                        lex = inFile.get();
+                }
+                    outFile<<"TokFloat";
+                }
+                else if(toupper(lex) == 'E'){
+                    int x=0;
+                }
+                else
+                outFile<<"TOKint"<<num;
+                inFile.unget();
+
+                }
+
+            }
             else if(lex == '/'){
                 lex = inFile.get();
                 if(lex == '/'){
