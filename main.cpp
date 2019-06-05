@@ -4,8 +4,47 @@
 #include <stdio.h>
 #include <list>
 #include <cstring>
+#include <sstream>
+#include <vector>
 
 using namespace std;
+
+class cToken{
+
+    protected:
+    string nomToken;
+    string lexema;
+    public:
+
+        //friend class cAnalisisLexico;
+        void setNomToken(string nomTok){
+            this -> nomToken=nomTok;
+        }
+        void setLexema(string lex="123"){
+            this -> lexema = lex;
+        }
+        string getName(){return this -> nomToken;}
+        string getLexema(){return this-> lexema;}
+
+};
+
+template <class T> class ctokenNum : public cToken{
+
+    T valorNum;
+    void setValor(T vN){
+        this ->valorNum=vN;
+    }
+
+    T getValor(){
+        return this -> valorNum;
+    }
+
+    T convierteToNum(){
+        stringstream aux = lexema;
+        aux>>valorNum;
+        return valorNum;
+    }
+};
 
 //Creamos una clase, class analisis Lexico
 class cAnalisisLexico{
@@ -18,6 +57,7 @@ class cAnalisisLexico{
     string nameFileOut;
 
     list<string> listaPR;
+    vector<cToken> bufferToken;
 
     //Creamos el constructor sin argumentos
 public:
@@ -31,6 +71,9 @@ public:
 
         verificaArgumentos(nargs, args);
 
+    }
+
+    cAnalisisSintactico(){
     }
 
 
@@ -148,6 +191,8 @@ public:
         return reservada;
     }
 
+vector <cToken> getTokens(){
+}
 
     void recuperaTokens(){
 
@@ -279,11 +324,14 @@ public:
 
 int main(int nargs, char**args){
 
-    cAnalisisLexico miAnalisis(nargs, args);
+    /*cAnalisisLexico miAnalisis(nargs, args);
 
     //miAnalisis.analizar();
     //miAnalisis.analizarLetra();
-    miAnalisis.recuperaTokens();
+    miAnalisis.recuperaTokens();*/
+
+
+
 
     return 0;
 
