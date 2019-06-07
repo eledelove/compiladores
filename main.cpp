@@ -6,6 +6,7 @@
 #include <cstring>
 #include <sstream>
 #include <vector>
+#include <map>
 
 using namespace std;
 
@@ -58,6 +59,8 @@ class cAnalisisLexico{
 
     list<string> listaPR;
     vector<cToken> bufferToken;
+    typedef void (cAnalisisLexico::*punteroFuncionToken)();
+    map<char,punteroFuncionToken> tipoToken;
 
     //Creamos el constructor sin argumentos
 public:
@@ -71,9 +74,6 @@ public:
 
         verificaArgumentos(nargs, args);
 
-    }
-
-    cAnalisisSintactico(){
     }
 
 
@@ -191,22 +191,33 @@ public:
         return reservada;
     }
 
-vector <cToken> getTokens(){
-}
+    void TokenPI(){
+        outFile<<"TokenPI";
+    }
 
     void recuperaTokens(){
 
         string id;
 
+        tipoToken['(']=&cAnalisisLexico::TokenPI;
+        /*tipoToken[';']=&cAnalisisLexico::TokenPyC;
+        tipoToken['/']=&cAnalisisLexico::TokenDIv;
+        tipoToken['<']=&cAnalisisLexico::TokenMenor;
+        tipoToken['>']=&cAnalisisLexico::TokenMayor;
+        tipoToken['[']=&cAnalisisLexico::TokenCorcheteIzq;*/
+
         while(inFile.good()){
 
             char lex =0;
             inFile.get(lex);
-            if(lex == '(') outFile<< "TokPI";
+            if(lex =='(')
+                (this->*tipoToken[lex])();
+
+            /*if(lex == '(') outFile<< "TokPI";
             else if(lex == ')') outFile<< "TokPD";
             else if(lex == ';') outFile<< "TokPyC";
             else if(lex == '<') outFile<< "TokMenor";
-            else if(lex == '>') outFile<< "TokMayor";
+            else if(lex == '>') outFile<< "TokMayor";*/
             else if(lex == '+' || lex== '-' || isdigit(lex) ){
 
                 string num;
@@ -324,11 +335,11 @@ vector <cToken> getTokens(){
 
 int main(int nargs, char**args){
 
-    /*cAnalisisLexico miAnalisis(nargs, args);
+    cAnalisisLexico miAnalisis(nargs, args);
 
     //miAnalisis.analizar();
     //miAnalisis.analizarLetra();
-    miAnalisis.recuperaTokens();*/
+    miAnalisis.recuperaTokens();
 
 
 
